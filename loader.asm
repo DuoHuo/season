@@ -1,15 +1,38 @@
-%include "boot.inc"
+	KERNEL_BASE	equ	0x800
+	KERNEL_BASE_PHY	equ	0x8000
+	MEMCHK_NUM_ADDR	equ	0x7e00
+	ADDR_RANGE_DESC_TBL_ADDR	equ	(MEMCHK_NUM_ADDR + 4)
+
 %include "pm.inc"
 
 	org	07c00h
 	mov	ax, cs
 	mov	ds, ax
 
+;save bios info before entering protected mode
+
+	mov	ebx, 0
+	mov	di, ADDR_RANGE_DESC_TBL_ADDR
+MEM_CHK_LOOP:
+	mov	eax, 0xe820
+	mov	ecx, 20
+	mov	edx, 0x534D4150
+	int	15h
+	jc	MEM_CHK_FAIL
+	add	di, 20
+	inc	dword [MEMCHK_NUM_ADDR]
+	cmp	ebx, 0
+	jne	MEM_CHK_LOOP
+	jmp	MEM_CHK_OK
+MEM_CHK_FAIL:
+	mov	dword [MEMCHK_NUM_ADDR], 0
+MEM_CHK_OK:
+
 	xor	ax, ax
 	xor	dl, dl
 	int	13
 
-	mov	ax, kernel_base
+	mov	ax, KERNEL_BASE
 	mov	es, ax
 	mov	ah, 02h
 	mov	al, 01h
@@ -65,7 +88,7 @@ PM_START:
 	mov	[gs:((80*0+39)*2)], ax
 
 
-	jmp	kernel_base_phy
+	jmp	KERNEL_BASE_PHY
 
 times	510-($-$$)	db	0
 		dw	0xaa55
