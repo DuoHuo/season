@@ -82,7 +82,6 @@ int main(int argc, char* argv[])
 	buf = malloc(pg_header.p_filesz);
 	fseek(in_filp, pg_header.p_offset, SEEK_SET);
 	fread(buf, pg_header.p_filesz, 1, in_filp);
-	printf("%x%x%x%x%x",buf[0],buf[1],buf[2],buf[3],buf[4]);
 	fwrite(buf, pg_header.p_filesz, 1, out_filp);
 	fclose(out_filp);
 	fclose(in_filp);

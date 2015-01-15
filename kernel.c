@@ -1,18 +1,12 @@
+#include "kernel.h"
+#include "lib.h"
+#include "interupt.h"
+
 #define MEMCHK_NUM_ADDR	0x7e00
 #define ADDR_RANGE_DESC_TBL_ADDR	(MEMCHK_NUM_ADDR+4)
 #define GRAPHIC_ADDR	0xb800
 #define PAGE_DIR_TBL_ADDR	0x100000
 #define PAGE_TBL_ADDR	(PAGE_DIR_TBL_ADDR+0x1000)
-
-#define u8 unsigned char
-#define u16 unsigned short
-#define u32 unsigned int
-#define u64 unsigned long
-#define pde_t u32
-#define pte_t u32
-
-#define ERR	-1
-#define OK	0
 
 struct addr_range_desc {
 	u32 baselow;
@@ -22,11 +16,10 @@ struct addr_range_desc {
 	u32 type;
 };
 
-
 /*
  * do not put any function defination upon cstart
  */
-extern void apply_paging();
+static void init_global_var();
 static int get_total_mem();
 static int setup_paging();
 
@@ -34,12 +27,22 @@ void cstart()
 {
 	int ret;
 
+	init_global_var();
 	ret = setup_paging();
 	if (ret < 0) {
 		goto out;
 	}
+	init_idtr();
+	init_8259A();
+	setup_idt();
+	set_interupt();
 out:
 	for(;;) {};
+}
+
+static void init_global_var()
+{
+	tmp_dbg = (int *)0x7dfc; //XXX
 }
 
 static int get_total_mem()
@@ -67,8 +70,6 @@ static int setup_paging()
 	long pt_base;
 	long pte_base;
 	int i;
-	int *tmp_dbg; //XXX
-	tmp_dbg = (int *)0x7dfc; //XXX
 
 	total_mem = get_total_mem();
 	*tmp_dbg = total_mem;

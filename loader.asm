@@ -10,7 +10,6 @@
 	mov	ds, ax
 
 ;save bios info before entering protected mode
-
 	mov	ebx, 0
 	mov	di, ADDR_RANGE_DESC_TBL_ADDR
 MEM_CHK_LOOP:
@@ -35,7 +34,7 @@ MEM_CHK_OK:
 	mov	ax, KERNEL_BASE
 	mov	es, ax
 	mov	ah, 02h
-	mov	al, 01h
+	mov	al, 04h ; kernel is in 4 sectors
 	mov	ch, 00h
 	mov	cl, 02h
 	mov	dh, 00h
