@@ -22,13 +22,13 @@ struct idtr {
 
 typedef void (*int_handler)();
 
-struct idt_entry idt[IDT_SIZE];
-struct idtr idtr_filler;
+extern struct idt_entry idt[IDT_SIZE];
+extern struct idtr idtr_filler;
 
-void init_idtr();
-void init_8259A();
-void setup_idt();
-void init_idt_entry(unsigned char vector, int_handler handler,\
+extern void init_idtr();
+extern void init_8259A();
+extern void setup_idt();
+extern void init_idt_entry(unsigned char vector, int_handler handler,\
 				unsigned char privilege);
 
 #endif

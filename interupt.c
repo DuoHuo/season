@@ -3,6 +3,9 @@
 #include "interupt.h"
 #include "interupt_entry.h"
 
+struct idt_entry idt[IDT_SIZE];
+struct idtr idtr_filler;
+
 void init_idtr()
 {
 	idtr_filler.limit = IDT_SIZE*sizeof(struct idt_entry)-1;

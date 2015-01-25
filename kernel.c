@@ -7,6 +7,9 @@
 #define GRAPHIC_ADDR	0xb800
 #define PAGE_DIR_TBL_ADDR	0x100000
 #define PAGE_TBL_ADDR	(PAGE_DIR_TBL_ADDR+0x1000)
+#define LDT_SIZE	5
+
+int *tmp_dbg;
 
 struct addr_range_desc {
 	u32 baselow;
@@ -14,6 +17,44 @@ struct addr_range_desc {
 	u32 lenlow;
 	u32 lenhigh;
 	u32 type;
+};
+
+struct ldt_entry {
+	u16 limit_low;
+	u16 base_low;
+	u8 base_mid;
+	u8 attr1;
+	u8 limit_high_attr2;
+	u8 base_high;
+};
+
+struct tcb_regs {
+	u32 gs;
+	u32 fs;
+	u32 es;
+	u32 ds;
+	u32 edi;
+	u32 esi;
+	u32 ebp;
+	u32 kernel_esp;
+	u32 ebx;
+	u32 edx;
+	u32 ecx;
+	u32 eax;
+	u32 retaddr;
+	u32 eip;
+	u32 cs;
+	u32 eflags;
+	u32 esp;
+	u32 ss;
+};
+
+struct tcb {
+	struct tcb_regs regs;
+	u16 ldt_sel;
+	struct idt_entry idt[LDT_SIZE];
+	u32 pid;
+	char p_name[16];
 };
 
 /*
