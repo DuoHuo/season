@@ -32,10 +32,44 @@ in_byte:
 	nop
 	ret
 
-; void load_idtr(idtr idtr_filler);
+; void load_idtr(struct dtr idtr);
 global load_idtr
 load_idtr:
 	lidt	[esp + 4]
+	nop
+	nop
+	ret
+
+; void load_gdtr(struct dtr gdtr);
+global load_gdtr
+load_gdtr:
+	lgdt	[esp + 4]
+	nop
+	nop
+	ret
+
+; void save_gdtr();
+extern gdtr
+global save_gdtr
+save_gdtr:
+	sgdt	[gdtr]
+	nop
+	nop
+	ret
+
+; void load_ldtr(struct dtr ldtr);
+global load_ldtr
+load_ldtr:
+	lldt	[esp + 4]
+	nop
+	nop
+	ret
+
+; void save_ldtr();
+extern ldtr
+global save_ldtr
+save_ldtr:
+	sldt	[ldtr]
 	nop
 	nop
 	ret

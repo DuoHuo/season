@@ -12,5 +12,4 @@
 #define OK	0
 
 extern int *tmp_dbg; 
-
 #endif

@@ -49,6 +49,8 @@ LABEL_GDT:		boot_descriptor	0,	0,	0
 LABEL_DESC_FLAT_C:	boot_descriptor	0,	0fffffh,DA_32|DA_CR|DA_LIMIT_4K
 LABEL_DESC_FLAT_RW:	boot_descriptor	0,	0fffffh,DA_32|DA_DRW|DA_LIMIT_4K
 LABEL_DESC_VIDEO:	boot_descriptor	0B8000h,0ffffh,	DA_DRW|DA_DPL3
+LABEL_DESC_LDT:		boot_descriptor 0,	0,	0
+LABEL_DESC_TSS:		boot_descriptor 0,	0,	0
 
 gdt_len		equ	$ - LABEL_GDT
 gdt_ptr		dw	gdt_len - 1

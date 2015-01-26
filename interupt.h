@@ -6,24 +6,12 @@
 #define	PRIVILEGE_TASK	1
 #define	PRIVILEGE_USER	3
 
-struct idt_entry {
-	u16 offset_low;
-	u16 selector;
-	u8 dcount;
-	u8 attr;
-	u16 offset_high;
-};
-
-struct idtr {
-	u16 limit;
-	u16 baselow;
-	u16 basehigh;
-};
+#include "protected.h"
 
 typedef void (*int_handler)();
 
 extern struct idt_entry idt[IDT_SIZE];
-extern struct idtr idtr_filler;
+extern struct dtr idtr;
 
 extern void init_idtr();
 extern void init_8259A();

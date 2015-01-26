@@ -1,16 +1,18 @@
 #include "kernel.h"
 #include "lib.h"
 #include "interupt.h"
+#include "protected.h"
 
 #define MEMCHK_NUM_ADDR	0x7e00
 #define ADDR_RANGE_DESC_TBL_ADDR	(MEMCHK_NUM_ADDR+4)
 #define GRAPHIC_ADDR	0xb800
 #define PAGE_DIR_TBL_ADDR	0x100000
 #define PAGE_TBL_ADDR	(PAGE_DIR_TBL_ADDR+0x1000)
-#define LDT_SIZE	5
+
+#define NUM_TASKS	10
+#define LDT_SIZE	4
 
 int *tmp_dbg;
-
 struct addr_range_desc {
 	u32 baselow;
 	u32 basehigh;
@@ -19,14 +21,11 @@ struct addr_range_desc {
 	u32 type;
 };
 
-struct ldt_entry {
-	u16 limit_low;
-	u16 base_low;
-	u8 base_mid;
-	u8 attr1;
-	u8 limit_high_attr2;
-	u8 base_high;
-};
+struct dtr gdtr;
+struct dtr ldtr;
+
+
+struct descriptor *gdt;
 
 struct tcb_regs {
 	u32 gs;
@@ -52,23 +51,59 @@ struct tcb_regs {
 struct tcb {
 	struct tcb_regs regs;
 	u16 ldt_sel;
-	struct idt_entry idt[LDT_SIZE];
+	struct descriptor idt[LDT_SIZE];
 	u32 pid;
 	char p_name[16];
+};
+
+struct tcb task_tbl[NUM_TASKS];
+
+struct tss {
+	u32 backlink;
+	u32 esp0;
+	u32 ss0;
+	u32 esp1;
+	u32 ss1;
+	u32 esp2;
+	u32 ss2;
+	u32 cr3;
+	u32 eip;
+	u32 flags;
+	u32 eax;
+	u32 ecx;
+	u32 edx;
+	u32 ebx;
+	u32 esp;
+	u32 ebp;
+	u32 esi;
+	u32 edi;
+	u32 es;
+	u32 cs;
+	u32 ss;
+	u32 ds;
+	u32 fs;
+	u32 gs;
+	u32 ldt;
+	u16 trap;
+	u16 iobase;
 };
 
 /*
  * do not put any function defination upon cstart
  */
 static void init_global_var();
+static void get_gdt_info();
 static int get_total_mem();
 static int setup_paging();
 
 void cstart()
 {
 	int ret;
+	struct tcb *idle_task;
 
+	/* do not put any function upon */
 	init_global_var();
+	get_gdt_info();
 	ret = setup_paging();
 	if (ret < 0) {
 		goto out;
@@ -77,6 +112,9 @@ void cstart()
 	init_8259A();
 	setup_idt();
 	set_interupt();
+
+	idle_task = &task_tbl[0];
+	//idle_task->
 out:
 	for(;;) {};
 }
@@ -84,6 +122,13 @@ out:
 static void init_global_var()
 {
 	tmp_dbg = (int *)0x7dfc; //XXX
+}
+
+static void get_gdt_info()
+{
+	/* save gdt limit&base to gdtr */
+	save_gdtr();
+	gdt = (struct descriptor *)gdtr.base;
 }
 
 static int get_total_mem()
@@ -113,7 +158,6 @@ static int setup_paging()
 	int i;
 
 	total_mem = get_total_mem();
-	*tmp_dbg = total_mem;
 
 	if (total_mem <= 0) {
 		return ERR;
@@ -136,4 +180,10 @@ static int setup_paging()
 	}
 	apply_paging();
 	return OK;
+}
+
+void idle_task()
+{
+	(*tmp_dbg) = 0x1100;
+	for (;;){};
 }

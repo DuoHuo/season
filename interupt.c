@@ -4,14 +4,13 @@
 #include "interupt_entry.h"
 
 struct idt_entry idt[IDT_SIZE];
-struct idtr idtr_filler;
+struct dtr idtr;
 
 void init_idtr()
 {
-	idtr_filler.limit = IDT_SIZE*sizeof(struct idt_entry)-1;
-	idtr_filler.basehigh = (u32)idt >> 16;
-	idtr_filler.baselow = (u32)idt & 0xffff;
-	load_idtr(idtr_filler);
+	idtr.limit = IDT_SIZE*sizeof(struct idt_entry)-1;
+	idtr.base = (u32)idt;
+	load_idtr(idtr);
 }
 
 void init_idt_entry(unsigned char vector, int_handler handler, \

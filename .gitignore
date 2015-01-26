@@ -4,3 +4,4 @@ a.img
 *.elf
 bochsout.txt
 elfextract
+tags
