@@ -1,4 +1,6 @@
 	PAGE_DIR_TBL_ADDR	equ	0x100000
+extern idle_task
+extern itss
 [BITS 32]
 ; void apply_paging
 global apply_paging
@@ -85,3 +87,29 @@ global clear_interupt
 clear_interupt:
 	cli
 	ret
+
+; void load_tss()
+global load_tss
+load_tss:
+	xor	eax, eax
+	mov	ax, 0x28 ; TSS Selector
+	ltr	ax
+	ret
+
+; void start_idle()
+global start_idle
+start_idle:
+	mov	esp, [idle_task]
+	lldt	[esp + (18*4)]	; ldt_sel offset in struct tcb
+	lea	eax, [esp + (18*4)]	; stack offset in struct tcb
+	mov	dword [itss + 4], eax	; esp0 offset in tss, set it to be
+					; the bottom of regs in struct tcp
+					; prepare for next 'real' interupt
+	pop	gs
+	pop	fs
+	pop	es
+	pop	ds
+	popad
+
+	add	esp, 4 ;skip retaddr
+	iretd

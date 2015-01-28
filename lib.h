@@ -15,5 +15,7 @@ extern void load_ldtr(struct dtr ldtr);
 extern void save_ldtr();
 extern void set_interupt();
 extern void clear_interupt();
+extern void load_tss();
+extern void start_idle();
 
 #endif

@@ -78,10 +78,9 @@ void init_8259A()
 
 void spurious_irq(int irq)
 {
-	(*tmp_dbg) = 0xaa;
 }
 
 void exception_handler(int vec_no, int err_code, int eip, int cs, int eflags)
 {
-	
+	(* tmp_dbg) = err_code;
 }
