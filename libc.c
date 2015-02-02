@@ -1,6 +1,8 @@
-#include "kernel.h"
+#include "libc.h"
+
 void *memcpy(void *dest, const void *src, int size)
 {
+	
 }
 
 void delay(int time)
@@ -12,4 +14,5 @@ void delay(int time)
 		}
 	}
 }
+
 

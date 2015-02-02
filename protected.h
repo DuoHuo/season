@@ -1,6 +1,8 @@
 #ifndef PROTECTED_H_H
 #define PROTECTED_H_H
-#include "kernel.h"
+#include "types.h"
+
+#define IDT_SIZE	256
 
 #define DA_32	0x4000
 #define DA_LIMIT_4K	0x8000
@@ -24,6 +26,7 @@
 #define	SA_TIG		0
 #define	SA_TIL		4
 
+
 /* descriptor for GDT and LDT */
 struct descriptor {
 	u16 limit_low;
@@ -34,7 +37,7 @@ struct descriptor {
 	u8 base_high;
 };
 
-typedef u16 selector_t;
+typedef unsigned short selector_t;
 
 struct idt_entry {
 	u16 offset_low;
@@ -49,6 +52,12 @@ struct dtr {
 	u16 limit;
 	u32 base;
 } __attribute__ ((packed));
+
+extern struct descriptor *gdt;
+extern struct idt_entry idt[IDT_SIZE];
+extern struct dtr gdtr;
+extern struct dtr idtr;
+extern struct dtr ldtr;
 
 extern void init_descriptor(struct descriptor *desc, u32 base, u32 limit, u16 attr);
 #endif

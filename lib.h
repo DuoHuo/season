@@ -1,8 +1,7 @@
 #ifndef LIB_H_H
 #define LIB_H_H
 
-#include "interupt.h"
-#include "kernel.h"
+#include "types.h"
 #include "protected.h"
 
 extern void apply_paging();
@@ -16,6 +15,8 @@ extern void save_ldtr();
 extern void set_interupt();
 extern void clear_interupt();
 extern void load_tss();
-extern void start_idle();
+extern void start_task();
+extern void inc_char2();
+extern void inc_char4();
 
 #endif

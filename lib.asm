@@ -113,3 +113,15 @@ start_task:
 
 	add	esp, 4 ;skip retaddr
 	iretd
+
+; void inc_char2()
+global inc_char2
+inc_char2:
+	inc	byte [gs:2]
+	ret
+
+; void inc_char4()
+global inc_char4
+inc_char4:
+	inc	byte [gs:4]
+	ret

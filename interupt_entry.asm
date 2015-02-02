@@ -1,6 +1,12 @@
 extern k_reenter
 extern	exception_handler
 extern	spurious_irq
+extern	kernel_stack
+extern	itss
+extern	scheduler
+extern	ready_task
+
+KERNEL_STACK_SIZE	equ	200
 
 global	divide_error
 global	single_step_exception
@@ -57,8 +63,6 @@ hwint00:
 	mov	ds, dx
 	mov	es, dx
 
-	inc	byte [gs:0]
-
 	mov	al, 0x20	; EndOfInterupt
 	out	0x20, al
 
@@ -67,17 +71,22 @@ hwint00:
 	jne	.re_enter
 
 ; TODO: move to kernel stack
+	mov	esp, (kernel_stack + KERNEL_STACK_SIZE)
 
 	sti
 ; TODO: call functions
-
+	call	scheduler
+	jmp	.next
+.next:
 	cli
 ; TODO: leave kernel stack to pcb.regs
+	mov	esp, [ready_task]
+	lldt	[esp + (18*4)]
+	lea	eax, [esp + (18*4)]
+	mov	dword [itss + 4], eax
 
-; TODO: tss.sp0
 .re_enter:
 	dec	dword [k_reenter]
-
 	pop	gs
 	pop	fs
 	pop	es
@@ -85,7 +94,6 @@ hwint00:
 	popad
 	add	esp, 4
 	iretd
-
 
 ALIGN   16
 hwint01:                ; Interrupt routine for irq 1 (keyboard)

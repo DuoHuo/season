@@ -1,17 +1,15 @@
 #ifndef INTERUPT_H_H
 #define INTERUPT_H_H
 
-#define IDT_SIZE	256
 #define	PRIVILEGE_KERN	0
 #define	PRIVILEGE_TASK	1
 #define	PRIVILEGE_USER	3
 
-#include "protected.h"
+#include "types.h"
 
 typedef void (*int_handler)();
 
-extern struct idt_entry idt[IDT_SIZE];
-extern struct dtr idtr;
+extern int k_reenter;
 
 extern void init_idtr();
 extern void init_8259A();

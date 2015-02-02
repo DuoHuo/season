@@ -1,10 +1,12 @@
+#include "types.h"
 #include "kernel.h"
-#include "lib.h"
 #include "interupt.h"
 #include "interupt_entry.h"
+#include "protected.h"
 
-struct idt_entry idt[IDT_SIZE];
-struct dtr idtr;
+
+
+int k_reenter; /* detect reentering of interupt handler */
 
 void init_idtr()
 {

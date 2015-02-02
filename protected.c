@@ -1,5 +1,12 @@
+#include "types.h"
 #include "protected.h"
-#include "kernel.h"
+
+struct descriptor *gdt;
+struct dtr gdtr;
+struct dtr ldtr;
+struct dtr idtr;
+
+struct idt_entry idt[IDT_SIZE];
 
 void init_descriptor(struct descriptor *desc, u32 base, u32 limit, u16 attr)
 {
