@@ -1,3 +1,4 @@
+extern k_reenter
 extern	exception_handler
 extern	spurious_irq
 
@@ -43,8 +44,48 @@ global  hwint15
 ; ---------------------------------
 
 ALIGN   16
-hwint00:                ; Interrupt routine for irq 0 (the clock).
-        hwint_master    0
+;hwint00:                ; Interrupt routine for irq 0 (the clock).
+;        hwint_master    0
+hwint00:
+	sub	esp, 4
+	pushad
+	push	ds
+	push	es
+	push	fs
+	push	gs
+	mov	dx, ss	; ss's DPL is 0 which others want to be
+	mov	ds, dx
+	mov	es, dx
+
+	inc	byte [gs:0]
+
+	mov	al, 0x20	; EndOfInterupt
+	out	0x20, al
+
+	inc	dword [k_reenter]
+	cmp	dword [k_reenter], 0
+	jne	.re_enter
+
+; TODO: move to kernel stack
+
+	sti
+; TODO: call functions
+
+	cli
+; TODO: leave kernel stack to pcb.regs
+
+; TODO: tss.sp0
+.re_enter:
+	dec	dword [k_reenter]
+
+	pop	gs
+	pop	fs
+	pop	es
+	pop	ds
+	popad
+	add	esp, 4
+	iretd
+
 
 ALIGN   16
 hwint01:                ; Interrupt routine for irq 1 (keyboard)

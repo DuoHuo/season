@@ -49,13 +49,13 @@ struct regs {
 };
 
 #define TASK_STACK_SIZE 200
-
+#define TASK_NAME_SIZE	16
 struct tcb {
 	struct regs regs;
 	selector_t ldt_sel;
 	struct descriptor ldt[LDT_SIZE];
 	u32 pid;
-	char p_name[16];
+	char p_name[TASK_NAME_SIZE];
 	u16 stack[TASK_STACK_SIZE];
 };
 
@@ -92,7 +92,7 @@ struct tss {
 };
 
 struct tss itss;
-struct tcb *idle_task;
+struct tcb *ready_task;
 
 /*
  * do not put any function defination upon cstart
@@ -105,6 +105,7 @@ static int setup_paging();
 
 void idle_task_main();
 
+int k_reenter; /* detect reentering of interupt handler */
 
 void cstart()
 {
@@ -125,20 +126,18 @@ void cstart()
 	init_idtr();
 	init_8259A();
 	setup_idt();
-	set_interupt();
 
-	idle_task = &task_tbl[0];
+	ready_task = &task_tbl[0];
 	/* initiate ldt in tcb */
-	init_descriptor(&(idle_task->ldt[0]), 0, 0x0fffff, DA_32 | DA_LIMIT_4K | DA_C | DA_DPL1);
-	init_descriptor(&(idle_task->ldt[1]), 0, 0x0fffff, DA_32 | DA_LIMIT_4K | DA_DRW| DA_DPL1);
+	init_descriptor(&(ready_task->ldt[0]), 0, 0x0fffff, DA_32 | DA_LIMIT_4K | DA_C | DA_DPL1);
+	init_descriptor(&(ready_task->ldt[1]), 0, 0x0fffff, DA_32 | DA_LIMIT_4K | DA_DRW| DA_DPL1);
 	/* introduce ldt gdt */  //TODO careful, the gdt
-	init_descriptor(&gdt[4], (u32)(idle_task->ldt), sizeof(struct descriptor) * LDT_SIZE - 1, DA_LDT);
-	idle_task->ldt_sel = 32;
+	init_descriptor(&gdt[4], (u32)(ready_task->ldt), sizeof(struct descriptor) * LDT_SIZE - 1, DA_LDT);
+	ready_task->ldt_sel = 32;
 	/* init tss */
 	itss.ss0 = 16; // Selector for Data
 	init_descriptor(&gdt[5], (u32)&itss, sizeof(itss)-1, DA_386TSS);
 	itss.iobase = sizeof(itss); // No I/O map
-	clear_interupt();
 	load_tss();
 	/* initiate registers */
 	cs_sel = (0 & SA_RPL_MASK & SA_TI_MASK) | SA_TIL | SA_RPL1;
@@ -147,24 +146,26 @@ void cstart()
 	fs_sel = (8 & SA_RPL_MASK & SA_TI_MASK) | SA_TIL | SA_RPL1;
 	ss_sel = (8 & SA_RPL_MASK & SA_TI_MASK) | SA_TIL | SA_RPL1;
 	gs_sel = (24 & SA_RPL_MASK) | SA_RPL1;
-	idle_task->regs.cs = cs_sel;
-	idle_task->regs.ds = ds_sel;
-	idle_task->regs.es = es_sel;
-	idle_task->regs.fs = fs_sel;
-	idle_task->regs.ss = ss_sel;
-	idle_task->regs.gs = gs_sel;
-	idle_task->regs.eip = (u32)idle_task_main;
-	idle_task->regs.esp = (u32) idle_task->stack + TASK_STACK_SIZE;
-	idle_task->regs.eflags = 0x1202; // IF=0, IOPL=1, bit 2 is always 1
+	ready_task->regs.cs = cs_sel;
+	ready_task->regs.ds = ds_sel;
+	ready_task->regs.es = es_sel;
+	ready_task->regs.fs = fs_sel;
+	ready_task->regs.ss = ss_sel;
+	ready_task->regs.gs = gs_sel;
+	ready_task->regs.eip = (u32)idle_task_main;
+	ready_task->regs.esp = (u32) ready_task->stack + TASK_STACK_SIZE;
+	ready_task->regs.eflags = 0x1202; // IF=0, IOPL=1, bit 2 is always 1
 
-	start_idle();
+	set_interupt();
+	start_task();
 out:
 	for(;;) {};
 }
 
 static void init_global_var()
 {
-	tmp_dbg = (int *)0x7dfc; 
+	tmp_dbg = (int *)0x7dfc;
+	k_reenter = -1;
 }
 
 static void get_gdt_info()

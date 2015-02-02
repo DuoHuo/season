@@ -1,5 +1,5 @@
 	PAGE_DIR_TBL_ADDR	equ	0x100000
-extern idle_task
+extern ready_task
 extern itss
 [BITS 32]
 ; void apply_paging
@@ -96,10 +96,10 @@ load_tss:
 	ltr	ax
 	ret
 
-; void start_idle()
-global start_idle
-start_idle:
-	mov	esp, [idle_task]
+; void start_task()
+global start_task
+start_task:
+	mov	esp, [ready_task]
 	lldt	[esp + (18*4)]	; ldt_sel offset in struct tcb
 	lea	eax, [esp + (18*4)]	; stack offset in struct tcb
 	mov	dword [itss + 4], eax	; esp0 offset in tss, set it to be
