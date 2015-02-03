@@ -70,16 +70,15 @@ hwint00:
 	cmp	dword [k_reenter], 0
 	jne	.re_enter
 
-; TODO: move to kernel stack
+; move to kernel stack
 	mov	esp, (kernel_stack + KERNEL_STACK_SIZE)
 
 	sti
-; TODO: call functions
+; call functions
 	call	scheduler
-	jmp	.next
-.next:
+
 	cli
-; TODO: leave kernel stack to pcb.regs
+; leave kernel stack to pcb.regs
 	mov	esp, [ready_task]
 	lldt	[esp + (18*4)]
 	lea	eax, [esp + (18*4)]

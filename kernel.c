@@ -45,7 +45,7 @@ void cstart()
 	init_tasks();
 
 	set_interupt();
-	start_task();
+	// start_task();
 out:
 	for(;;) {};
 }
