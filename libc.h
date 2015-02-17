@@ -3,6 +3,7 @@
 
 #include "types.h"
 #include "interupt.h"
+#include "protected.h"
 
 void *memcpy(void *dest, const void *src, int size);
 void init_descriptor(struct descriptor *desc, u32 base, u32 limit, u16 attr);

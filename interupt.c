@@ -3,10 +3,17 @@
 #include "interupt.h"
 #include "interupt_entry.h"
 #include "protected.h"
+#include "task.h"
 
 
+int_handler isr_tbl[ISR_NUM];
 
 int k_reenter; /* detect reentering of interupt handler */
+
+
+static void init_isr_tbl();
+static void init_idt_entry(unsigned char vector, int_handler handler, \
+			unsigned char privilege);
 
 void init_idtr()
 {
@@ -15,18 +22,6 @@ void init_idtr()
 	load_idtr(idtr);
 }
 
-void init_idt_entry(unsigned char vector, int_handler handler, \
-			unsigned char privilege)
-{
-	struct idt_entry *entry = &idt[vector];
-	u32 base = (u32)handler;
-
-	entry->offset_low = base & 0xffff;
-	entry->selector = 8; //TODO
-	entry->dcount = 0;
-	entry->attr = 0x8E | (privilege << 5);
-	entry->offset_high = (base >> 16) & 0xffff;
-}
 
 void setup_idt()
 {
@@ -62,6 +57,7 @@ void setup_idt()
 	init_idt_entry(0x2d, hwint13, PRIVILEGE_KERN);
 	init_idt_entry(0x2e, hwint14, PRIVILEGE_KERN);
 	init_idt_entry(0x2f, hwint15, PRIVILEGE_KERN);
+	init_isr_tbl();
 }
 
 void init_8259A()
@@ -78,7 +74,27 @@ void init_8259A()
 	out_byte(0xa1,	0xff);
 }
 
-void spurious_irq(int irq)
+
+void switch_ldt_in_gdt()
+{
+
+	init_descriptor(&gdt[4], (u32)(ready_task->ldt), sizeof(struct descriptor) * LDT_SIZE - 1, DA_LDT);
+}
+
+void add_isr(int irq, int_handler handler)
+{
+	isr_tbl[irq] = handler;
+}
+
+/* Below are real ISRs */
+
+static void clock_routine(int irq)
+{
+	ticks ++;
+	scheduler();
+}
+
+static void default_routine(int irq)
 {
 }
 
@@ -86,3 +102,32 @@ void exception_handler(int vec_no, int err_code, int eip, int cs, int eflags)
 {
 	(* tmp_dbg) = err_code;
 }
+
+
+static void init_isr_tbl()
+{
+	int i;
+
+	for (i = 0; i < ISR_NUM; i++) {
+		isr_tbl[i] = default_routine;
+	}
+	add_isr(0, clock_routine);
+}
+
+/*
+ * init_idt_entry is used to initiate idt entries, using add_isr function 
+ * to define specific Interupt Service Routine(ISR)
+**/
+static void init_idt_entry(unsigned char vector, int_handler handler, \
+			unsigned char privilege)
+{
+	struct idt_entry *entry = &idt[vector];
+	u32 base = (u32)handler;
+
+	entry->offset_low = base & 0xffff;
+	entry->selector = 8; //TODO
+	entry->dcount = 0;
+	entry->attr = 0x8E | (privilege << 5);
+	entry->offset_high = (base >> 16) & 0xffff;
+}
+

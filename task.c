@@ -1,5 +1,6 @@
 #include "task.h"
 #include "kernel.h"
+#include "interupt.h"
 
 char kernel_stack[KERNEL_STACK_SIZE];
 struct tcb task_tbl[TASK_NUM];
@@ -79,13 +80,13 @@ void init_tasks()
 	load_tss();
 }
 
-volatile void scheduler()
+void scheduler()
 {
 	int i;
 
 	i = (ready_task->pid - 1);
 	i = (i + 1) % TASK_NUM;
 	ready_task = &task_tbl[i];
-	init_descriptor(&gdt[4], (u32)(ready_task->ldt), sizeof(struct descriptor) * LDT_SIZE - 1, DA_LDT);
+	switch_ldt_in_gdt();
 }
 

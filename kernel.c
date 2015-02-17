@@ -12,6 +12,7 @@
 #define PAGE_TBL_ADDR	(PAGE_DIR_TBL_ADDR+0x1000)
 
 int *tmp_dbg;
+int ticks;
 
 struct addr_range_desc {
 	u32 baselow;
@@ -30,14 +31,9 @@ static int setup_paging();
  */
 void cstart()
 {
-	int ret;
-
 	/* do not put any function upon */
 	init_global_var();
 	get_gdt_info();
-	if (ret < 0) {
-		goto out;
-	}
 	init_idtr();
 	init_8259A();
 	setup_idt();
@@ -45,9 +41,8 @@ void cstart()
 	init_tasks();
 
 	set_interupt();
-	// start_task();
-out:
-	for(;;) {};
+	start_task();
+	while (1) {}
 }
 
 
