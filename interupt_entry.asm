@@ -4,6 +4,7 @@ extern	kernel_stack
 extern	itss
 extern	ready_task
 extern	isr_tbl
+extern	sys_call_tbl
 extern	scheduler
 KERNEL_STACK_SIZE	equ	200
 
@@ -39,6 +40,7 @@ global  hwint12
 global  hwint13
 global  hwint14
 global  hwint15
+global	sys_call
 
 %macro  hwint_master    1
 	sub	esp, 4
@@ -1069,3 +1071,42 @@ exception:
 	call	exception_handler
 	add	esp, 4*2	; 让栈顶指向 EIP，堆栈中从顶向下依次是：EIP、CS、EFLAGS
 	hlt
+
+ALIGN	16
+sys_call:
+	sub	esp, 4
+	pushad
+	push	ds
+	push	es
+	push	fs
+	push	gs
+	mov	dx, ss		; ss's DPL is 0 which others want to be
+	mov	ds, dx
+	mov	es, dx
+
+	inc	dword [k_reenter]
+	cmp	dword [k_reenter], 0
+	jne	.re_enter_sys_call
+
+	mov	esp, (kernel_stack + KERNEL_STACK_SIZE)
+
+	sti
+	push	15
+	call	[sys_call_tbl + 4 * eax]
+	cli
+
+	mov	esp, [ready_task]
+	lldt	[esp + (18*4)]
+	mov	[esp + (11*4)], eax
+	lea	eax, [esp + (18*4)]
+	mov	dword [itss + 4], eax
+.re_enter_sys_call:
+
+	dec	dword [k_reenter]
+	pop	gs
+	pop	fs
+	pop	es
+	pop	ds
+	popad
+	add	esp, 4
+	iretd

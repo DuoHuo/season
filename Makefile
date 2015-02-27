@@ -5,9 +5,11 @@ all:
 	gcc -c -m32 -o libc.o libc.c
 	gcc -c -m32 -o protected.o protected.c
 	gcc -c -m32 -o task.o task.c
+	gcc -c -m32 -o sys_call.o sys_call.c
 	nasm -f elf -o lib.o lib.asm
 	nasm -f elf -o interupt_entry.o interupt_entry.asm
-	ld -s -Ttext 0x8000 -o kernel.elf -melf_i386 kernel.o interupt.o lib.o interupt_entry.o libc.o protected.o task.o
+	nasm -f elf -o sys_call_entry.o sys_call_entry.asm
+	ld -s -Ttext 0x8000 -o kernel.elf -melf_i386 kernel.o interupt.o lib.o interupt_entry.o libc.o protected.o task.o sys_call.o sys_call_entry.o
 	./elfextract kernel.elf kernel.bin
 	nasm -o loader.bin loader.asm
 	dd if=loader.bin of=a.img conv=notrunc

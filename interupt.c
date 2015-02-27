@@ -14,6 +14,7 @@ int k_reenter; /* detect reentering of interupt handler */
 static void init_isr_tbl();
 static void init_idt_entry(unsigned char vector, int_handler handler, \
 			unsigned char privilege);
+extern void sys_call();
 
 void init_idtr()
 {
@@ -22,9 +23,9 @@ void init_idtr()
 	load_idtr(idtr);
 }
 
-
-void setup_idt()
+static void init_idt_entries()
 {
+	/* error interupt */
 	init_idt_entry(0x00, divide_error, PRIVILEGE_KERN);
 	init_idt_entry(0x01, single_step_exception, PRIVILEGE_KERN);
 	init_idt_entry(0x02, nmi, PRIVILEGE_KERN);
@@ -41,6 +42,7 @@ void setup_idt()
 	init_idt_entry(0x0d, general_protection, PRIVILEGE_KERN);
 	init_idt_entry(0x0e, page_fault, PRIVILEGE_KERN);
 	init_idt_entry(0x10, copr_error, PRIVILEGE_KERN);
+	/* hardware interupt */
 	init_idt_entry(0x20, hwint00, PRIVILEGE_KERN);
 	init_idt_entry(0x21, hwint01, PRIVILEGE_KERN);
 	init_idt_entry(0x22, hwint02, PRIVILEGE_KERN);
@@ -57,6 +59,13 @@ void setup_idt()
 	init_idt_entry(0x2d, hwint13, PRIVILEGE_KERN);
 	init_idt_entry(0x2e, hwint14, PRIVILEGE_KERN);
 	init_idt_entry(0x2f, hwint15, PRIVILEGE_KERN);
+	/* system call */
+	init_idt_entry(0x80, sys_call, PRIVILEGE_USER);
+}
+
+void setup_idt()
+{
+	init_idt_entries();
 	init_isr_tbl();
 }
 

@@ -4,6 +4,7 @@
 #include "interupt.h"
 #include "protected.h"
 #include "task.h"
+#include "sys_call.h"
 
 #define MEMCHK_NUM_ADDR	0x7e00
 #define ADDR_RANGE_DESC_TBL_ADDR	(MEMCHK_NUM_ADDR+4)
@@ -37,6 +38,7 @@ void cstart()
 	init_idtr();
 	init_8259A();
 	setup_idt();
+	init_sys_call_tbl();
 
 	init_tasks();
 
@@ -52,6 +54,7 @@ static void init_global_var()
 {
 	tmp_dbg = (int *)0x7dfc;
 	k_reenter = -1;
+	ticks = 0;
 }
 
 static void get_gdt_info()
