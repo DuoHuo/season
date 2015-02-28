@@ -5,6 +5,7 @@
 #include "protected.h"
 #include "task.h"
 #include "sys_call.h"
+#include "time.h"
 
 #define MEMCHK_NUM_ADDR	0x7e00
 #define ADDR_RANGE_DESC_TBL_ADDR	(MEMCHK_NUM_ADDR+4)
@@ -35,6 +36,7 @@ void cstart()
 	/* do not put any function upon */
 	init_global_var();
 	get_gdt_info();
+	init_pit();
 	init_idtr();
 	init_8259A();
 	setup_idt();

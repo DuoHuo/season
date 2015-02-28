@@ -1,6 +1,7 @@
 #include "task.h"
 #include "kernel.h"
 #include "sys_call_entry.h"
+#include "time.h"
 
 char kernel_stack[KERNEL_STACK_SIZE];
 struct tcb task_tbl[TASK_NUM];
@@ -13,6 +14,7 @@ static void idle_task_fun()
 
 	for (i = 0; ; i ++) {
 		inc_char2();
+		delay(30000);
 	}
 }
 
@@ -22,7 +24,7 @@ static void second_task_fun()
 
 	for (i = 0; ; i++) {
 		inc_char4();
-		(*tmp_dbg) = get_ticks();
+		delay(10000);
 	}
 }
 
