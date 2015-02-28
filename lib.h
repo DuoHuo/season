@@ -18,5 +18,6 @@ extern void load_tss();
 extern void start_task();
 extern void inc_char2();
 extern void inc_char4();
+extern void inc_char6();
 
 #endif

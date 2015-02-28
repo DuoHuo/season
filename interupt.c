@@ -4,7 +4,8 @@
 #include "interupt_entry.h"
 #include "protected.h"
 #include "task.h"
-
+#include "lib.h"
+#include "keyboard.h"
 
 int_handler isr_tbl[ISR_NUM];
 
@@ -79,7 +80,7 @@ void init_8259A()
 	out_byte(0xa1,	0x2);
 	out_byte(0x21,	0x1);
 	out_byte(0xa1,	0x1);
-	out_byte(0x21,	0xfe);
+	out_byte(0x21,	0xfc);
 	out_byte(0xa1,	0xff);
 }
 
@@ -103,6 +104,20 @@ static void clock_routine(int irq)
 	scheduler();
 }
 
+static void keyboard_routine(int irq)
+{
+	u8 code;
+
+	code = in_byte(0x60);
+	if (keyboard_buf.count < KEYBOARD_BUF_LEN) {
+		*(keyboard_buf.head) = code;
+		keyboard_buf.head++;
+		if (keyboard_buf.head == keyboard_buf.buf + KEYBOARD_BUF_LEN)
+			keyboard_buf.head = keyboard_buf.buf;
+		keyboard_buf.count++;
+	}
+}
+
 static void default_routine(int irq)
 {
 }
@@ -121,6 +136,7 @@ static void init_isr_tbl()
 		isr_tbl[i] = default_routine;
 	}
 	add_isr(0, clock_routine);
+	add_isr(1, keyboard_routine);
 }
 
 /*

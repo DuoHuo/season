@@ -125,3 +125,9 @@ global inc_char4
 inc_char4:
 	inc	byte [gs:4]
 	ret
+
+; void inc_char6()
+global inc_char6
+inc_char6:
+	inc	byte [gs:6]
+	ret

@@ -14,7 +14,6 @@ static void idle_task_fun()
 
 	for (i = 0; ; i ++) {
 		inc_char2();
-		delay(30000);
 	}
 }
 
@@ -24,7 +23,6 @@ static void second_task_fun()
 
 	for (i = 0; ; i++) {
 		inc_char4();
-		delay(10000);
 	}
 }
 

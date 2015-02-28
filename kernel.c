@@ -6,6 +6,7 @@
 #include "task.h"
 #include "sys_call.h"
 #include "time.h"
+#include "keyboard.h"
 
 #define MEMCHK_NUM_ADDR	0x7e00
 #define ADDR_RANGE_DESC_TBL_ADDR	(MEMCHK_NUM_ADDR+4)
@@ -41,6 +42,7 @@ void cstart()
 	init_8259A();
 	setup_idt();
 	init_sys_call_tbl();
+	init_keyboard();
 
 	init_tasks();
 
