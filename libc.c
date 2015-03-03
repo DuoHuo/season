@@ -1,4 +1,3 @@
-#include "libc.h"
 #include "lib.h"
 
 int disp_pos;

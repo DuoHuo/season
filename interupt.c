@@ -5,7 +5,6 @@
 #include "protected.h"
 #include "task.h"
 #include "lib.h"
-#include "libc.h"
 #include "keyboard.h"
 
 int_handler isr_tbl[ISR_NUM];

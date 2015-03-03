@@ -3,7 +3,9 @@
 
 #include "types.h"
 #include "protected.h"
+#include "interupt.h"
 
+/* lib.asm */
 extern void apply_paging();
 extern void out_byte(u16 port, u8 value);
 extern u8 in_byte(u16 port);
@@ -20,5 +22,13 @@ extern void inc_char2();
 extern void inc_char4();
 extern void inc_char6();
 extern void disp_str(char *string);
+
+/* libc.c */
+extern int disp_pos;	/* strores the current display position */
+
+extern void *memcpy(void *dest, const void *src, int size);
+extern void init_descriptor(struct descriptor *desc, u32 base, u32 limit, u16 attr);
+extern char * itoa(char * str, int num);
+extern void disp_int(int integer);
 
 #endif

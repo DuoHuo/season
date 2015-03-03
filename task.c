@@ -3,7 +3,6 @@
 #include "sys_call_entry.h"
 #include "time.h"
 #include "lib.h"
-#include "libc.h"
 
 char kernel_stack[KERNEL_STACK_SIZE];
 struct tcb task_tbl[TASK_NUM];
