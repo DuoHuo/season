@@ -48,7 +48,7 @@ MEM_CHK_OK:
 LABEL_GDT:		boot_descriptor	0,	0,	0
 LABEL_DESC_FLAT_C:	boot_descriptor	0,	0fffffh,DA_32|DA_CR|DA_LIMIT_4K
 LABEL_DESC_FLAT_RW:	boot_descriptor	0,	0fffffh,DA_32|DA_DRW|DA_LIMIT_4K
-LABEL_DESC_VIDEO:	boot_descriptor	0B8000h,0ffffh,	DA_DRW|DA_DPL3
+LABEL_DESC_VIDEO:	boot_descriptor	0B8000h,0ffffh,	DA_DRW|DA_DPL0
 LABEL_DESC_LDT:		boot_descriptor 0,	0,	0
 LABEL_DESC_TSS:		boot_descriptor 0,	0,	0
 
@@ -58,7 +58,7 @@ gdt_ptr		dw	gdt_len - 1
 
 selector_flat_c		equ	LABEL_DESC_FLAT_C - LABEL_GDT
 selector_flat_rw	equ	LABEL_DESC_FLAT_RW - LABEL_GDT
-selector_video		equ	LABEL_DESC_VIDEO - LABEL_GDT + SA_RPL3
+selector_video		equ	LABEL_DESC_VIDEO - LABEL_GDT + SA_RPL0
 
 
 SWITCH_PM:
@@ -83,11 +83,6 @@ PM_START:
 	mov	fs, ax
 	mov	ss, ax
 	mov	esp, 0x7c00
-
-	mov	ah, 0fh
-	mov	al, 'P'
-	mov	[gs:((80*0+39)*2)], ax
-
 
 	jmp	KERNEL_BASE_PHY
 

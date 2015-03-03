@@ -2,6 +2,8 @@
 #include "kernel.h"
 #include "sys_call_entry.h"
 #include "time.h"
+#include "lib.h"
+#include "libc.h"
 
 char kernel_stack[KERNEL_STACK_SIZE];
 struct tcb task_tbl[TASK_NUM];
@@ -13,7 +15,7 @@ static void idle_task_fun()
 	int i;
 
 	for (i = 0; ; i ++) {
-		inc_char2();
+
 	}
 }
 
@@ -22,7 +24,7 @@ static void second_task_fun()
 	int i;
 
 	for (i = 0; ; i++) {
-		inc_char4();
+
 	}
 }
 
@@ -54,7 +56,7 @@ void init_task(struct tcb *ptcb, task_fun_t task_fun, int pid, char *name)
 	es_sel = (8 & SA_RPL_MASK & SA_TI_MASK) | SA_TIL | SA_RPL1;
 	fs_sel = (8 & SA_RPL_MASK & SA_TI_MASK) | SA_TIL | SA_RPL1;
 	ss_sel = (8 & SA_RPL_MASK & SA_TI_MASK) | SA_TIL | SA_RPL1;
-	gs_sel = (24 & SA_RPL_MASK) | SA_RPL1;
+	gs_sel = (24 & SA_RPL_MASK) | SA_RPL0;
 	ptcb->regs.cs = cs_sel;
 	ptcb->regs.ds = ds_sel;
 	ptcb->regs.es = es_sel;

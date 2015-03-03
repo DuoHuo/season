@@ -1,6 +1,7 @@
 	PAGE_DIR_TBL_ADDR	equ	0x100000
-extern ready_task
-extern itss
+extern	ready_task
+extern	itss
+extern	disp_pos
 [BITS 32]
 ; void apply_paging
 global apply_paging
@@ -130,4 +131,41 @@ inc_char4:
 global inc_char6
 inc_char6:
 	inc	byte [gs:6]
+	ret
+
+; void disp_str(char *string)
+global disp_str
+disp_str:
+	push	ebp
+	mov	ebp, esp
+
+	mov	esi, [ebp + 8]
+	mov	edi, [disp_pos]
+	mov	ah, 0Fh
+.1:
+	lodsb
+	test	al, al
+	jz	.2
+	cmp	al, 0Ah	; `enter`?
+	jnz	.3
+	push	eax
+	mov	eax, edi
+	mov	bl, 160
+	div	bl
+	and	eax, 0FFh
+	inc	eax
+	mov	bl, 160
+	mul	bl
+	mov	edi, eax
+	pop	eax
+	jmp	.1
+.3:
+	mov	[gs:edi], ax
+	add	edi, 2
+	jmp	.1
+
+.2:
+	mov	[disp_pos], edi
+
+	pop	ebp
 	ret

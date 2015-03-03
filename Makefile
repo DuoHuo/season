@@ -2,7 +2,7 @@ all:
 	gcc elfextract.c -o elfextract
 	gcc -c -m32 -o kernel.o kernel.c
 	gcc -c -m32 -o interupt.o interupt.c
-	gcc -c -m32 -o libc.o libc.c
+	gcc -c -m32 -o libc.o libc.c -fno-stack-protector
 	gcc -c -m32 -o protected.o protected.c
 	gcc -c -m32 -o task.o task.c
 	gcc -c -m32 -o sys_call.o sys_call.c

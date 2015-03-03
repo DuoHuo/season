@@ -19,5 +19,6 @@ extern void start_task();
 extern void inc_char2();
 extern void inc_char4();
 extern void inc_char6();
+extern void disp_str(char *string);
 
 #endif
