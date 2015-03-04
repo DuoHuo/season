@@ -2,12 +2,7 @@
 
 int disp_pos;
 
-void * memcpy(void *dest, const void *src, int size)
-{
-	
-}
-
-char * itoa(char * str, int num)
+char * kitoa(char * str, int num)
 {
 	char *	p = str;
 	char	ch;
@@ -38,10 +33,9 @@ char * itoa(char * str, int num)
 
 	return str;
 }
-
 void disp_int(int input)
 {
 	char output[16];
-	itoa(output, input);
+	kitoa(output, input);
 	disp_str(output);
 }

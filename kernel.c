@@ -47,9 +47,7 @@ void cstart()
 	init_tasks();
 
 	set_interupt();
-	disp_str("\n");
-	disp_str("starting tasks\ntmp_debug = ");
-	disp_int(*tmp_dbg);
+	printf("hello %x %x:%x", 1, 2, 3);
 	start_task();
 	while (1) {}
 }

@@ -3,6 +3,7 @@
 #include "sys_call_entry.h"
 #include "time.h"
 #include "lib.h"
+#include "ulib.h"
 
 char kernel_stack[KERNEL_STACK_SIZE];
 struct tcb task_tbl[TASK_NUM];
@@ -14,7 +15,6 @@ static void idle_task_fun()
 	int i;
 
 	for (i = 0; ; i ++) {
-
 	}
 }
 
@@ -23,7 +23,6 @@ static void second_task_fun()
 	int i;
 
 	for (i = 0; ; i++) {
-
 	}
 }
 

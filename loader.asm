@@ -34,7 +34,7 @@ MEM_CHK_OK:
 	mov	ax, KERNEL_BASE
 	mov	es, ax
 	mov	ah, 02h
-	mov	al, 10h ; kernel is in 16 sectors
+	mov	al, 16h ; kernel is in 16 sectors
 	mov	ch, 00h
 	mov	cl, 02h
 	mov	dh, 00h

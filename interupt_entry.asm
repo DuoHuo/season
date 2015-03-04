@@ -1091,8 +1091,10 @@ sys_call:
 	mov	esp, (kernel_stack + KERNEL_STACK_SIZE)
 
 	sti
-	push	15
+	push	ecx
+	push	ebx
 	call	[sys_call_tbl + 4 * eax]
+	add	esp, 4 * 2
 	cli
 
 	mov	esp, [ready_task]

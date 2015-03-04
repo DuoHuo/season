@@ -44,6 +44,7 @@ int main(int argc, char* argv[])
 	char file_type[FILE_TYPE_LEN];
 	int num_ph;
 	char *buf;
+	int count;
 
 	in_file_path = argv[1];
 	out_file_path = argv[2];
@@ -83,6 +84,8 @@ int main(int argc, char* argv[])
 	fseek(in_filp, pg_header.p_offset, SEEK_SET);
 	fread(buf, pg_header.p_filesz, 1, in_filp);
 	fwrite(buf, pg_header.p_filesz, 1, out_filp);
+	count = pg_header.p_filesz;
+	printf("%d bytes are written.\n", count);
 	fclose(out_filp);
 	fclose(in_filp);
 	return 0;

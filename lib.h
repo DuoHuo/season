@@ -28,7 +28,7 @@ extern int disp_pos;	/* strores the current display position */
 
 extern void *memcpy(void *dest, const void *src, int size);
 extern void init_descriptor(struct descriptor *desc, u32 base, u32 limit, u16 attr);
-extern char * itoa(char * str, int num);
+extern char * kitoa(char * str, int num);
 extern void disp_int(int integer);
 
 #endif
